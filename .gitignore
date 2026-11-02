@@ -1,0 +1,7 @@
+*.keystore
+*.jks
+*.p12
+*.key
+local.properties
+.env
+.env.*
