@@ -1,0 +1,2 @@
+API_KEY=SUA_CHAVE
+# Exemplo apenas. Armazene a chave real no servidor, não no APK ou código público.
