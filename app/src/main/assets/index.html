@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080d17">
+<title>HORUS AI</title>
+<style>
+:root{--bg:#080d17;--surface:#0f1726;--surface2:#152137;--line:#263348;--muted:#8594ad;--fg:#ecf3ff;--blue:#3285ff;--cyan:#87c9ff;--glass:rgba(13,22,38,.97)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Roboto",sans-serif}
+button,input,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button{border:0;background:none;color:inherit}
+#app{height:100%;height:100dvh;display:flex;flex-direction:column;position:relative}
+.header{height:67px;flex-shrink:0;padding:8px 13px;display:flex;align-items:center;justify-content:space-between;gap:7px;border-bottom:1px solid rgba(94,128,185,.10);background:var(--bg);z-index:3}
+.icon-btn{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;color:#dce9ff;flex-shrink:0}
+.icon-btn:active{background:var(--surface2)}
+.icon-btn svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round}
+.app-title{font-size:17px;font-weight:760;white-space:nowrap;letter-spacing:-.5px}
+.brand-micro{font-size:10px;letter-spacing:1.5px;color:var(--cyan);font-weight:800;margin-bottom:2px}
+.model-top{display:flex;align-items:center;gap:7px;border-radius:13px;padding:7px 8px 7px 10px;min-width:0;flex:1;text-align:left}
+.model-top:active{background:#14233a}
+.model-top strong{font-size:11px;color:#d8eaff;max-width:128px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-weight:550;display:block;margin-top:2px}
+.model-top .arrow{color:#7f96b5;font-size:14px}
+.online-pill{padding:5px 7px;border:1px solid #1e5b52;border-radius:30px;background:#092621;color:#65dbba;font-size:10px;font-weight:800;letter-spacing:.25px;flex-shrink:0}
+#messages{flex:1;overflow-y:auto;scroll-behavior:smooth;overscroll-behavior:contain;min-height:0;scrollbar-width:thin;scrollbar-color:#2e3c53 transparent}
+.messages-inner{max-width:810px;margin:auto;padding:15px 18px 27px}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:14px 19px 38px;text-align:center}
+.logo{width:77px;height:77px;border-radius:25px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#40b4ff,#1963ef 66%,#0e40b1);box-shadow:0 13px 34px #175de744, inset 0 1px 1px #a7dfff88;color:white;font-size:39px;font-weight:700;letter-spacing:-4px;transform:rotate(-3deg)}
+.empty h1{font-size:29px;font-weight:720;letter-spacing:-1.05px;line-height:1.15;margin:25px 0 10px}
+.empty p{font-size:14px;line-height:1.6;color:#96a7c3;margin:0 0 27px;max-width:320px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;max-width:400px;gap:10px}
+.card{min-height:94px;text-align:left;padding:13px 13px 11px;border-radius:18px;background:linear-gradient(160deg,#142037,#101929);border:1px solid #263650}
+.card:active{border-color:#3789ff;background:#152842}
+.card .mini{font-size:21px;display:block;margin-bottom:9px}
+.card strong{font-size:13px;font-weight:640}
+.card span.sub{display:block;font-size:11px;color:#8194b3;margin-top:4px}
+.msg-row{display:flex;flex-direction:column;margin:14px 0 22px;animation:rise .16s ease-out}
+@keyframes rise{from{opacity:.55;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.msg-row.user{align-items:flex-end}
+.user-bubble{max-width:90%;border-radius:21px 21px 6px 21px;background:#1d3760;border:1px solid #284b80;white-space:pre-wrap;overflow-wrap:anywhere;padding:13px 16px;color:#eef6ff;font-size:15px;line-height:1.52}
+.assistant-wrap{display:flex;align-items:flex-start;gap:11px;width:100%}
+.assistant-logo{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:#000000;font-weight:800;color:white;font-size:19px;flex-shrink:0;margin-top:2px}
+.assistant-text{flex:1;min-width:0;font-size:15px;line-height:1.66;overflow-wrap:anywhere;color:#e4ecff;white-space:normal}
+.assistant-text h3,.assistant-text h4{margin:8px 0 6px;font-size:16px}
+.assistant-text p{margin:0 0 12px}.assistant-text p:last-child{margin-bottom:0}
+.assistant-text code{background:#1a2b45;color:#bfddff;padding:2px 5px;border-radius:5px;font-size:13px}
+.assistant-text pre{margin:12px 0;background:#0a111f;border:1px solid #233b5b;border-radius:13px;padding:14px;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+.assistant-text pre code{background:none;padding:0;color:#d1e7ff;font-size:12px}
+.answer-actions{padding-left:45px;margin-top:9px;display:flex;gap:10px}
+.action-mini{font-size:12px;color:#899ab5;padding:4px 7px;border-radius:7px}
+.action-mini:active{background:#1d2f4a}
+.typing{display:flex;gap:5px;align-items:center;padding:9px 0}
+.typing b{display:block;width:7px;height:7px;border-radius:50%;background:#82baff;animation:pulse 1.1s infinite}
+.typing b:nth-child(2){animation-delay:.2s}.typing b:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,65%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.composer-shell{flex-shrink:0;background:linear-gradient(0deg,#080d17 85%,#080d1700);padding:10px 12px max(12px,env(safe-area-inset-bottom));z-index:2}
+.composer{display:flex;align-items:flex-end;gap:10px;background:#131d2d;border:1px solid #2b3a53;border-radius:24px;padding:10px 10px 10px 16px;max-width:810px;margin:0 auto;box-shadow:0 5px 27px #0003}
+#prompt{color:#eff6ff;flex:1;background:none;border:0;outline:0;resize:none;line-height:1.48;font-size:15px;max-height:150px;min-height:27px;overflow-y:auto;margin:4px 0 1px;padding:0}
+#prompt::placeholder{color:#8494af}
+.send{width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#54aeff,#2674ef);border-radius:15px;flex-shrink:0;box-shadow:0 5px 14px #1d70e744}
+.send:disabled{background:#273449;box-shadow:none;color:#74839a}
+.send svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.footnote{font-size:10px;text-align:center;color:#56657c;padding-top:9px}
+.layer{position:fixed;inset:0;z-index:10;pointer-events:none;visibility:hidden}
+.layer.show{visibility:visible;pointer-events:auto}
+.scrim{position:absolute;inset:0;background:#0009;opacity:0;transition:opacity .22s}
+.layer.show .scrim{opacity:1}
+.sidebar{position:absolute;top:0;bottom:0;left:0;width:min(83vw,330px);padding:20px 14px;display:flex;flex-direction:column;background:#101827;transform:translateX(-105%);transition:transform .2s ease;border-right:1px solid #30405a}
+.layer.show .sidebar{transform:translateX(0)}
+.side-top{display:flex;align-items:center;justify-content:space-between;padding:3px 8px 17px}
+.side-brand{font-size:19px;font-weight:780;letter-spacing:-.8px}
+.blue-dot{color:#57a6ff}
+.side-new{display:flex;align-items:center;gap:12px;text-align:left;border:1px solid #2d3c54;background:#17243a;border-radius:14px;padding:14px 15px;font-size:14px;font-weight:650;width:100%}
+.side-new:active{background:#203452}
+.search-wrap{margin:15px 0 16px;background:#182337;border:1px solid #25374e;border-radius:12px;padding:9px 12px;display:flex;align-items:center;gap:10px}
+.search-wrap span{color:#8ea1bd}
+.search-wrap input{outline:0;background:none;border:0;color:var(--fg);font-size:13px;width:100%}
+.search-wrap input::placeholder{color:#71809a}
+.history-label{font-size:11px;color:#758aa9;letter-spacing:.8px;font-weight:750;margin:0 8px 11px}
+#chat-list{overflow-y:auto;flex:1}
+.chat-item{display:flex;align-items:center;border-radius:12px;padding:12px 10px;gap:8px;margin:2px 0;color:#c7d5eb}
+.chat-item.active{background:#203454;color:white}
+.chat-item .chat-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.chat-item .del{width:27px;height:27px;display:flex;align-items:center;justify-content:center;color:#8799b0;border-radius:8px}
+.chat-item .del:active{color:#ff7d89;background:#45202f}
+.side-foot{border-top:1px solid #26374e;padding-top:12px;margin-top:12px}
+.side-setting{display:flex;align-items:center;gap:13px;padding:12px;font-size:13px;color:#d7e5f9;width:100%;text-align:left;border-radius:12px}
+.side-setting:active{background:#1d2e47}
+.modal{position:absolute;left:0;right:0;bottom:0;max-height:85%;background:#121d2d;border-radius:25px 25px 0 0;border-top:1px solid #375579;transform:translateY(105%);transition:transform .24s ease;display:flex;flex-direction:column;padding:20px 17px max(20px,env(safe-area-inset-bottom))}
+.layer.show .modal{transform:translateY(0)}
+.grabber{width:41px;height:4px;border-radius:10px;background:#435571;align-self:center;margin:0 0 16px}
+.modal h2{font-size:21px;letter-spacing:-.5px;margin:0 0 5px}
+.modal p{font-size:13px;color:#879ab8;margin:0 0 20px;line-height:1.5}
+#model-search{width:100%;border:1px solid #2c3c55;border-radius:13px;background:#19273b;padding:13px;color:white;outline:0;font-size:14px;margin-bottom:12px}
+.models-scroll{flex:1;overflow-y:auto;min-height:0}
+.model-row{display:flex;align-items:center;gap:11px;padding:15px 12px;border-radius:13px;border-bottom:1px solid #22324a;width:100%;text-align:left}
+.model-row.active{background:#1b3453;border:1px solid #29609d}
+.vendor-circle{width:34px;height:34px;border-radius:13px;background:#203b60;color:#a5ceff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:750;flex-shrink:0}
+.model-meta{flex:1;min-width:0}
+.model-meta strong{font-size:13px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.model-meta small{font-size:11px;color:#8296b5;display:block;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.free-tag{font-size:10px;color:#91e7bf;background:#12362f;border:1px solid #1a5e4e;padding:5px 8px;border-radius:30px;flex-shrink:0;font-weight:750}
+#toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(12px);opacity:0;transition:.22s;background:#223853;color:white;border:1px solid #3a5c86;border-radius:14px;padding:12px 16px;z-index:30;max-width:88%;font-size:13px;pointer-events:none;text-align:center;box-shadow:0 10px 30px #0007}
+#toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
+.settings-label{font-size:13px;color:#b0c4e4;margin:14px 0 9px}
+#replacement-key{border:1px solid #30435d;border-radius:12px;background:#17253b;color:white;padding:12px;width:100%;font-size:13px}
+.settings-btn{border-radius:13px;background:#276ddd;padding:13px 15px;margin-top:11px;text-align:center;font-size:13px;font-weight:750;width:100%}
+.settings-btn.secondary{background:#1e304b;color:#a8cbff}
+.status-card{border:1px solid #2c4b57;background:#14292d;border-radius:14px;padding:15px;color:#abefd9;font-size:13px}
+@media(min-width:820px){.sidebar{width:350px}.empty{padding-bottom:70px}}
+
+/* Real APK Builder */
+#app{padding-top:max(12px,env(safe-area-inset-top))}
+.header{min-height:67px;height:auto}
+.composer-shell{padding-bottom:calc(max(12px,env(safe-area-inset-bottom)) + 19px)}
+.footnote{display:none}
+.logo,.assistant-logo{overflow:hidden;background:#0d1422;border:1px solid #304866}
+.logo img,.assistant-logo img{width:100%;height:100%;object-fit:cover;transform:scale(1.18);display:block;image-rendering:auto}
+.apk-launch{background:linear-gradient(120deg,#1a72ed,#338ffb);border-radius:13px;padding:14px 16px;color:#fff;display:flex;gap:12px;align-items:center;font-size:14px;font-weight:750;min-height:50px;width:100%;text-align:left;margin-top:12px}
+.apk-launch:active{filter:brightness(1.2)}
+.build-field{border:1px solid #344660;background:#0d1729;border-radius:14px;padding:12px 13px;color:#ecf3ff;width:100%;outline:0;font-size:14px;display:block}
+.build-field:focus{border-color:#398dff}
+.build-field.multiline{resize:vertical;min-height:128px;max-height:230px;line-height:1.5}
+.build-label{font-size:12px;color:#abc4e6;margin:16px 0 7px;font-weight:650}
+.builder-desc{font-size:12px;line-height:1.5;color:#91a6c5;margin-top:10px}
+.builder-status{font-size:12px;line-height:1.55;white-space:pre-wrap;background:#0c1b32;border:1px solid #28456c;border-radius:13px;padding:12px;color:#bbd8ff;margin-top:13px}
+.builder-action{background:linear-gradient(135deg,#338eff,#155be0);color:#fff;border-radius:13px;padding:14px;font-size:14px;font-weight:750;width:100%;margin-top:14px}
+.builder-action:disabled{opacity:.5}
+.builder-action.secondary{background:#1b2d49;color:#d5e8ff;border:1px solid #2a4266}
+.builder-head{display:flex;align-items:center;gap:9px}
+.builder-toplogo{font-size:19px}
+.builder-github{font-size:12px;color:#8da7c8;margin-top:8px;line-height:1.5}
+.build-modal{max-height:calc(100dvh - 28px);height:min(88dvh,790px);overflow-y:auto;overscroll-behavior:contain;scroll-padding-bottom:35px;padding-bottom:calc(46px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
+
+
+/* HORUS AI — premium identity and cinematic launch */
+.app-title{display:flex;align-items:center;gap:5px;letter-spacing:.055em;font-size:17px;font-weight:900}
+.horus-word{color:#eff9ff;text-shadow:0 0 15px #9edcff42;font-weight:900;letter-spacing:.07em}
+.horus-ai{font-weight:900;letter-spacing:.08em;color:#66cfff;text-shadow:0 0 17px #2fb4ff74;margin-left:2px}
+.horus-sigil{color:#92d8ff;font-size:15px;margin-left:2px}
+.side-brand{display:inline-flex;align-items:center;gap:5px;font-size:21px;letter-spacing:.06em}
+50%{transform:scale(1.05);opacity:1}}
+
+
+/* HORUS AI · Pure black mobile Chat / Work skin */
+:root{--bg:#000;--surface:#191919;--surface2:#272727;--line:#414141;--muted:#9b9b9b;--fg:#f4f4f4;--blue:#2867ee;--cyan:#8ccaff;--glass:#171717}
+html,body{background:#000;color:#f7f7f7}
+#app{background:#000;padding-top:0!important}
+.header{height:77px;min-height:77px;display:grid;grid-template-columns:45px minmax(0,1fr) 45px;align-items:center;gap:9px;border:0;background:#000;padding:13px 12px 7px;box-shadow:none}
+.top-round{display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#2b2b2b;color:white;border:1px solid #515151;border-radius:50%;padding:0;flex-shrink:0}
+.top-round svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round}
+.top-round:active{background:#444}
+.mode-switch{display:flex;align-items:center;margin:auto;width:min(100%,175px);height:44px;border-radius:999px;background:#3b3b3b;padding:4px;gap:2px}
+.mode-tab{flex:1;min-width:0;height:100%;font-size:15px;font-weight:500;color:#f3f3f3;border-radius:999px;transition:background .15s ease}
+.mode-tab.selected{background:#1d1d1d;box-shadow:0 1px 2px #0002}
+#messages{background:#000;scrollbar-width:none}
+#messages::-webkit-scrollbar{display:none}
+.messages-inner{padding:9px 13px 24px;max-width:830px}
+.msg-row{margin:13px 0 24px}
+.user-bubble{background:#2d2d2d;color:#f7f7f7;border:0;border-radius:23px 23px 6px 23px}
+.assistant-logo{background:#101010;border:1px solid #383838;border-radius:50%}
+.assistant-text{color:#f1f1f1}
+.assistant-text pre{background:#171717;border:1px solid #3b3b3b}
+.assistant-text code{background:#242424;color:#d1e8ff}
+.answer-actions{padding-left:43px}
+.action-mini{color:#a9a9a9}
+.typing b{background:#7cc0ff}
+.composer-shell{background:#000;padding:8px 11px 12px!important;flex-shrink:0;z-index:2}
+.composer{background:#303030;border:1px solid #4b4b4b;border-radius:999px;padding:6px 7px 6px 9px;display:flex;align-items:center;gap:8px;min-height:61px;max-width:860px;box-shadow:none}
+.composer-plus{width:37px;height:45px;flex:0 0 37px;display:flex;align-items:center;justify-content:center;color:#eee;border-radius:50%;padding:0}
+.composer-plus svg{width:29px;height:29px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
+#prompt{flex:1;min-width:0;min-height:28px;max-height:115px;align-self:center;resize:none;font-size:15px;line-height:1.45;color:#f1f1f1;margin:0;padding:6px 0;background:transparent;overflow-y:auto}
+#prompt::placeholder{color:#aaa}
+.composer-mic{display:flex;align-items:center;justify-content:center;width:33px;height:43px;flex:0 0 33px;color:#f4f4f4;padding:0}
+.composer-mic svg{height:25px;width:25px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.send,.send:disabled{display:flex;align-items:center;justify-content:center;height:45px;width:45px;flex:0 0 45px;background:#2769ed;color:#fff;border-radius:50%;box-shadow:none;opacity:1;padding:0}
+.send svg{height:25px;width:25px;fill:none;stroke:currentColor;stroke-width:2.05;stroke-linecap:round}
+.send .send-arrow-icon{display:none}
+.send.has-text .waveform-icon{display:none}
+.send.has-text .send-arrow-icon{display:block}
+.send:disabled{opacity:.55}
+.sidebar{background:#131313;border-right:1px solid #393939}
+.side-new{background:#292929;border:1px solid #464646;color:#f2f2f2}
+.apk-launch{background:#1f58c8;border-radius:14px}
+.search-wrap{background:#222;border:1px solid #3b3b3b}
+.chat-item.active{background:#303030}
+.side-foot{border-top:1px solid #383838}
+.modal{background:#1b1b1b;border-top:1px solid #474747}
+.grabber{background:#696969}
+#model-search,#replacement-key,.build-field{background:#282828;border:1px solid #484848;color:#f4f4f4}
+.model-row{border-bottom:1px solid #363636}
+.model-row.active{background:#2c2c2c;border:1px solid #525252}
+.vendor-circle{background:#333;color:#ddd}
+.settings-btn.secondary,.builder-action.secondary{background:#303030;color:#e5e5e5;border:1px solid #494949}
+.status-card,.builder-status{background:#202020;border-color:#484848;color:#eee}
+.build-label,.settings-label{color:#ddd}
+#toast{background:#242424;border:1px solid #505050;box-shadow:0 6px 30px #0008}
+#work-page{flex:1;min-height:0;overflow:auto;background:#000}
+.work-hero{max-width:630px;margin:0 auto;padding:67px 24px 36px}
+.work-mark{width:56px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:18px;border:1px solid #2c4b88;color:#8bb7ff;background:linear-gradient(145deg,#131c30,#111);font-size:29px}
+.work-overline{margin-top:27px;font-size:11px;color:#a4a4a4;font-weight:800;letter-spacing:1.65px}
+.work-hero h1{font-size:30px;line-height:1.16;font-weight:650;letter-spacing:-1px;margin:10px 0 15px;color:#f6f6f6}
+.work-hero p{font-size:14px;line-height:1.6;color:#a8a8a8;margin:0 0 26px}
+.work-primary{width:100%;min-height:55px;border-radius:16px;padding:13px 16px;background:#2767ed;color:white;text-align:left;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.work-primary span{font-size:22px}
+.work-actions{margin-top:19px;display:flex;flex-direction:column;gap:9px}
+.work-actions button{min-height:53px;border:1px solid #393939;border-radius:15px;background:#191919;color:#eee;text-align:left;padding:14px 17px;font-size:14px}
+.work-actions button:active{background:#262626}
+.work-hero .work-disclaimer{font-size:11px;line-height:1.6;color:#777;margin:24px 0}
+.quick-modal{padding-bottom:30px}
+.quick-action{display:flex;gap:17px;align-items:center;padding:15px;border-bottom:1px solid #353535;color:#e9e9e9;font-size:15px;text-align:left;width:100%}
+.quick-action:active{background:#303030}
+@media(max-width:355px){
+  .header{grid-template-columns:45px minmax(0,1fr) 45px;gap:3px;padding:9px 8px 6px}
+  .top-round{width:44px;height:44px}
+  .mode-switch{height:46px}
+  .composer{gap:5px}
+  #prompt{font-size:14px}
+}
+
+
+/* HORUS AI v2.6.3 — Android safe-area and soft-keyboard fix */
+:root{
+  --horus-top-safe: max(29px, env(safe-area-inset-top, 0px));
+  --horus-bottom-safe: max(66px, env(safe-area-inset-bottom, 0px));
+  --horus-visible-height: 100dvh;
+}
+#app{
+  padding-top:var(--horus-top-safe)!important;
+  height:100dvh;
+  min-height:0;
+}
+.composer-shell{
+  padding:8px 11px var(--horus-bottom-safe)!important;
+}
+body.horus-keyboard-visible .composer-shell{
+  padding-bottom:max(12px, env(safe-area-inset-bottom, 0px))!important;
+}
+body.horus-keyboard-visible #app{
+  height:var(--horus-visible-height)!important;
+}
+body.horus-keyboard-visible .modal{
+  max-height:calc(var(--horus-visible-height) * .86);
+}
+
+/* HORUS AI 2.6.5 - visible free-model selector & compact icon system */
+.header{
+  min-height:60px!important;
+  height:60px!important;
+  grid-template-columns:40px minmax(0,1fr) 40px;
+  gap:7px;
+  padding:7px 13px 5px;
+}
+.top-round{width:38px;height:38px;border-radius:50%}
+.top-round svg{width:20px;height:20px;stroke-width:1.9}
+.mode-switch{width:min(100%,169px);height:39px;padding:3px}
+.mode-tab{font-size:14px}
+.model-select-bar{flex:0 0 auto;display:flex;align-items:center;justify-content:center;padding:0 15px 8px;background:#000}
+.model-picker{height:33px;max-width:min(100%,300px);min-width:0;display:flex;align-items:center;justify-content:center;gap:7px;padding:5px 12px;background:#1d1d1d;border:1px solid #343434;border-radius:999px;color:#dedede}
+.model-picker:active{background:#292929}
+.model-picker-star{font-size:15px;color:#89baff;line-height:1}
+.model-prefix{font-size:11px;white-space:nowrap;color:#aaaaaa}
+#model-label{font-size:12px;line-height:1.2;max-width:190px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:580}
+.model-chevron{width:14px;height:14px;fill:none;stroke:#ababab;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.composer-shell{padding-left:11px!important;padding-right:11px!important}
+.composer{min-height:53px;padding:5px 7px 5px 8px;gap:5px}
+.composer-plus{height:40px;width:30px;flex:0 0 30px}
+.composer-plus svg{width:22px;height:22px}
+.composer-mic{height:40px;width:29px;flex:0 0 29px}
+.composer-mic svg{width:20px;height:20px}
+.send,.send:disabled{width:39px;height:39px;flex:0 0 39px}
+.send svg{width:20px;height:20px}
+.assistant-logo{width:29px;height:29px}
+.assistant-wrap{gap:9px}
+.answer-actions{padding-left:38px}
+.card .mini{font-size:18px}
+.icon-btn svg{width:20px;height:20px}
+.side-setting span{font-size:17px!important}
+.side-new span{font-size:17px!important}
+.model-row{padding:11px 10px;gap:9px}
+.vendor-circle{width:30px;height:30px;border-radius:10px;font-size:15px}
+.model-meta strong{font-size:12px}
+.free-tag{font-size:9px;padding:4px 7px}
+.work-mark{height:46px;width:46px;font-size:23px;border-radius:15px}
+.work-actions button{min-height:48px}
+.work-primary{min-height:50px}
+.work-primary span{font-size:18px}
+.builder-toplogo{font-size:17px}
+@media(max-width:355px){
+  .header{grid-template-columns:38px minmax(0,1fr) 38px;gap:5px;padding-left:10px;padding-right:10px}
+  .model-picker{max-width:90vw}
+  .mode-switch{width:min(100%,159px)}
+  .model-select-bar{padding-bottom:6px}
+}
+
+/* HORUS AI v2.7.1 - Sidebar inspired by the Android chat navigation reference */
+.horus-drawer{
+  width:min(80vw,350px);max-width:350px;
+  padding:calc(max(40px,env(safe-area-inset-top,0px)) + 9px) 15px max(75px,env(safe-area-inset-bottom,0px))!important;
+  background:#202020;border-right:1px solid #292929;box-shadow:12px 0 38px #0007;
+  display:flex;flex-direction:column;gap:0;
+}
+.drawer-heading{display:flex;align-items:center;justify-content:space-between;padding:0 12px 20px;min-height:66px}
+.drawer-logo{font-size:23px;font-weight:690;letter-spacing:-.65px;color:#f5f5f5;white-space:nowrap}
+.drawer-logo b{font-size:18px;color:#9bbcff;letter-spacing:0}
+.drawer-search-button{height:42px;width:42px;border-radius:50%;background:#303030;border:1px solid #4a4a4a;color:#f4f4f4;display:grid;place-items:center;flex:none}
+.drawer-search-button svg{width:20px;height:20px}
+.drawer-search-button:active{background:#414141}
+.drawer-search-wrap{display:none;align-items:center;gap:5px;background:#303030;border-radius:13px;border:1px solid #484848;margin:0 9px 9px;padding:3px 7px 3px 12px}
+.drawer-search-wrap.expanded{display:flex}
+.drawer-search-wrap input{min-width:0;flex:1;background:transparent;border:0;outline:none;color:#fafafa;font-size:13px;padding:9px 2px}
+.drawer-search-wrap input::placeholder{color:#b2b2b2}
+.drawer-search-wrap button{width:35px;height:35px;display:grid;place-items:center;border-radius:50%}
+.drawer-search-wrap svg{width:17px;height:17px}
+.drawer-actions{display:flex;flex-direction:column;gap:1px;padding:4px 3px 12px;flex:0 0 auto}
+.drawer-action{display:flex;align-items:center;text-align:left;gap:15px;width:100%;min-height:52px;padding:8px 12px;border-radius:13px;color:#ececec;font-size:15px;font-weight:450}
+.drawer-action:active,.drawer-action:focus-visible{background:#353535}
+.drawer-action svg{width:21px;height:21px;flex-shrink:0;color:#eee}
+.drawer-history{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:none;margin:3px -3px 0;padding:2px 3px 0}
+.drawer-history::-webkit-scrollbar{display:none}
+.drawer-section{font-size:13px;font-weight:610;color:#e1e1e1;margin:14px 13px 12px;letter-spacing:0}
+.drawer-chat-item{width:100%;min-height:43px;display:flex;align-items:center;gap:0;border-radius:9px;padding:0 3px;margin:1px 0;color:#dedede}
+.drawer-chat-item.active{background:#3b3b3b}
+.drawer-chat-title{min-width:0;flex:1;display:flex;align-items:center;gap:9px;text-align:left;font-size:14px;padding:9px 5px 9px 8px;overflow:hidden}
+.drawer-chat-title span:last-child{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0}
+.drawer-chat-glyph{width:20px;height:20px;flex:0 0 20px;color:#e2e2e2}
+.drawer-chat-glyph svg{width:20px;height:20px}
+.drawer-small-btn{width:30px;height:34px;flex:0 0 30px;border-radius:9px;display:grid;place-items:center;color:#aaa}
+.drawer-small-btn svg{height:17px;width:17px}
+.drawer-small-btn:active{background:#555;color:#fff}
+.drawer-small-btn.pinned{color:#9bbcff}
+.drawer-empty{color:#9b9b9b;font-size:13px;margin:20px 14px;line-height:1.5}
+.drawer-footer{flex:none;display:flex;align-items:center;justify-content:space-between;padding:13px 7px 0;border-top:1px solid #363636;gap:5px}
+.drawer-new-cta{display:flex;align-items:center;gap:9px;background:#3268e8;color:white;border-radius:99px;padding:11px 15px;font-weight:580;font-size:14px;min-height:43px;white-space:nowrap}
+.drawer-new-cta svg{width:18px;height:18px}
+.drawer-new-cta:active{background:#2657c5}
+.drawer-version{color:#9e9e9e;font-size:11px;white-space:nowrap}
+@media(max-width:350px){.horus-drawer{width:84vw;padding-left:11px!important;padding-right:11px!important}.drawer-action{font-size:14px;min-height:49px}.drawer-footer{gap:3px}.drawer-version{font-size:10px}}
+
+/* HORUS AI 2.7.1 - Local user profile */
+.drawer-profile-trigger{width:45px;height:45px;flex:0 0 45px;display:grid;place-items:center;border-radius:50%;border:1px solid #545454;background:#303030;padding:3px;overflow:hidden}
+.drawer-profile-trigger:active{background:#505050}
+.user-avatar{display:flex;align-items:center;justify-content:center;width:37px;height:37px;border-radius:50%;flex:none;background:#2563eb;color:white;font-weight:650;font-size:17px;overflow:hidden;line-height:1}
+.user-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.profile-modal{max-height:min(86dvh,720px);overflow-y:auto;padding-bottom:calc(35px + max(0px,env(safe-area-inset-bottom,0px)));-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.profile-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.profile-head h2{margin:0;color:#fff;font-size:22px}
+.profile-close{font-size:18px;border:1px solid #4b4b4b;background:#292929;border-radius:12px;height:36px;width:36px}
+.profile-modal p{margin:8px 0 14px;color:#aaa;font-size:12px;line-height:1.5}
+.profile-avatar-area{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:10px}
+.profile-avatar-large{width:77px;height:77px;border:2px solid #555;font-size:31px}
+.profile-pick-photo{border:1px solid #4b4b4b;border-radius:99px;padding:9px 15px;background:#303030;font-size:13px;color:#eee}
+.profile-field-label{font-size:12px;font-weight:650;color:#ddd;margin:10px 0 7px}
+.profile-input{width:100%;color:#f4f4f4;background:#292929;border:1px solid #505050;border-radius:12px;padding:12px 13px;min-height:43px;font-size:14px;outline:none}
+.profile-bio{resize:vertical;max-height:110px;line-height:1.4}
+.profile-input:focus{border-color:#598df4}
+.profile-swatches{display:flex;gap:11px;align-items:center;min-height:39px}
+.profile-swatch{width:32px;height:32px;flex:none;border:2px solid #888;border-radius:50%;background:var(--swatch);box-shadow:inset 0 0 0 1px #ffffff22}
+.profile-swatch.selected{outline:2px solid #e4e4e4;outline-offset:2px}
+.profile-save{background:#326cf0;color:white;border-radius:12px;padding:13px;width:100%;font-size:14px;font-weight:650;margin-top:18px;min-height:44px}
+.profile-save:active{background:#1f58c7}
+.profile-remove{font-size:12px;color:#aaa;align-self:center;text-align:center;padding:10px 8px;margin:3px auto 0}
+.profile-photo-url-row{display:flex;align-items:center;gap:7px;width:100%}
+.profile-photo-url-row .profile-input{flex:1;min-width:0}
+.profile-photo-url-row .profile-pick-photo{flex:none;min-height:43px}
+.profile-photo-hint{max-width:310px;color:#b2b2b2;font-size:12px;line-height:1.45;text-align:left}
+.profile-image-paste{width:100%;min-height:44px;border:1px dashed #595959;background:#222;border-radius:12px;padding:12px 9px;outline:0;text-align:center;font-size:12px;color:#bbb}
+.profile-image-paste:empty:before{content:attr(data-placeholder)}
+.profile-image-paste:focus{border-color:#5684e9}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="header">
+    <button class="top-round" onclick="showSidebar()" aria-label="Abrir menu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h11"/></svg>
+    </button>
+    
+    <div class="mode-switch" role="tablist" aria-label="Modo do HORUS AI">
+      <button type="button" class="mode-tab selected" id="tab-chat" role="tab" aria-selected="true" onclick="switchMode('chat')">Chat</button>
+      <button type="button" class="mode-tab" id="tab-work" role="tab" aria-selected="false" onclick="switchMode('work')">Work</button>
+    </div>
+    <button class="top-round" onclick="createNewFromTop()" aria-label="Nova conversa">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a8.1 8.1 0 0 1-8 8.1 8.8 8.8 0 0 1-3.6-.7L4 20l1.2-4.2a8 8 0 1 1 14.8-4.3Z"/></svg>
+    </button>
+  </header>
+  <div class="model-select-bar">
+    <button type="button" class="model-picker" id="model-picker" onclick="showModels()" aria-label="Selecionar modelo de IA" title="Trocar modelo da IA">
+      <span class="model-picker-star" aria-hidden="true">✦</span>
+      <span class="model-prefix">Modelo</span>
+      <span id="model-label" aria-live="polite">Carregando modelos gratuitos…</span>
+      <svg class="model-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+    </button>
+  </div>
+  <main id="messages"><div id="conversation" class="messages-inner"></div></main>
+  <main id="work-page" style="display:none">
+    <div class="work-hero">
+      <div class="work-mark" aria-hidden="true">✦</div>
+      <div class="work-overline">HORUS AI · WORK</div>
+      <h1>Crie seu próximo aplicativo.</h1>
+      <p>Descreva o que você quer. O HORUS prepara o projeto e utiliza o GitHub Actions para compilar um APK Android.</p>
+      <button class="work-primary" onclick="showBuilder()">Criar aplicativo Android <span aria-hidden="true">↗</span></button>
+      <div class="work-actions">
+        <button onclick="showBuilder()">▤ &nbsp; Novo projeto APK</button>
+        <button onclick="showSettings()">⚙ &nbsp; Configurar GitHub</button>
+        <button onclick="switchMode('chat')">✦ &nbsp; Voltar ao Chat</button>
+      </div>
+      <p class="work-disclaimer">Recursos que dependem de serviços externos precisam de integração própria. A compilação não garante ausência total de bugs.</p>
+    </div>
+  </main>
+  <div class="composer-shell" id="chat-composer">
+    <div class="composer">
+      <button class="composer-plus" onclick="openQuickActions()" aria-label="Adicionar ou abrir ações">
+        <svg viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></svg>
+      </button>
+      <textarea id="prompt" rows="1" placeholder="Perguntar ao HORUS AI" aria-label="Sua mensagem"></textarea>
+      <button class="composer-mic" onclick="startDictation()" aria-label="Digitar por voz" title="Digitar por voz">
+        <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="13" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg>
+      </button>
+      <button class="send" id="send" onclick="sendOrDictate()" aria-label="Enviar mensagem ou ditar">
+        <svg class="waveform-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4M7 6v12M11 3v18M15 8v8M19 5v14M23 10v4"/></svg>
+        <svg class="send-arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V4M5 11l7-7 7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="layer" id="quick-layer">
+  <div class="scrim" onclick="closeLayers()"></div>
+  <section class="modal quick-modal">
+    <div class="grabber"></div>
+    <h2>O que deseja fazer?</h2>
+    <button class="quick-action" onclick="newChat();switchMode('chat');closeLayers()">✎ <span>Nova conversa</span></button>
+    <button class="quick-action" onclick="switchMode('work');closeLayers()">⌘ <span>Criar aplicativo Android</span></button>
+    <button class="quick-action" onclick="closeLayers();showModels()">✦ <span>Escolher modelo de IA</span></button>
+    <button class="quick-action" onclick="startDictation();closeLayers()">◉ <span>Digitar usando o microfone</span></button>
+  </section>
+</div>
+<div class="layer" id="side-layer">
+  <div class="scrim" onclick="closeLayers()"></div>
+  <aside class="sidebar horus-drawer" aria-label="Menu lateral HORUS AI">
+    <div class="drawer-heading">
+      <div class="drawer-logo"><span>HORUS</span> <b>AI</b></div>
+      <button class="drawer-search-button" onclick="toggleDrawerSearch()" aria-label="Pesquisar conversas" title="Pesquisar conversas"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"/><path d="m16.5 16.5 5 5"/></svg></button>
+    </div>
+    <div class="drawer-search-wrap" id="drawer-search-wrap">
+      <input id="search-chats" type="search" oninput="renderChats()" placeholder="Pesquisar conversas..." aria-label="Pesquisar conversas">
+      <button onclick="clearDrawerSearch()" aria-label="Limpar busca"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
+    </div>
+    <nav class="drawer-actions" aria-label="Navegação">
+      <button class="drawer-action" onclick="newChat();switchMode('chat');closeLayers()"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/><path d="M14 7l4-4 3 3-4 4-7 7-4 1 1-4Z"/></svg><span>Nova conversa</span></button>
+      <button class="drawer-action" onclick="switchMode('work');closeLayers()"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg><span>Projetos / Work</span></button>
+      <button class="drawer-action" onclick="showBuilder()"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 7h6M12 11v6m-3-3 3 3 3-3"/></svg><span>Criar APK Android</span></button>
+      <button class="drawer-action" onclick="showModels()"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2Z"/></svg><span>Modelos gratuitos</span></button>
+      <button class="drawer-action" onclick="showProfile()"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span>Meu perfil</span></button>
+      <button class="drawer-action" onclick="showSettings()"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="m20 14 1-2-1-2-2.2-.5-.8-1.5.7-2.1-2-1.2-1.8 1.3h-1.8L11.3 4H9l-.7 2.1-1.5 1L4.6 6l-1.5 2 1.4 1.8-.5 1.7L2 12l.5 2.2 2.2.4.9 1.4-.7 2.1 2 1.2 1.7-1.4h1.8L11.3 20h2.2l.7-2.2 1.5-.9 2.2.8 1.4-2-.8-1.7Z"/></svg><span>Configurações</span></button>
+    </nav>
+    <div id="chat-list" class="drawer-history" aria-label="Histórico de conversas"></div>
+    <div class="drawer-footer">
+      <button class="drawer-new-cta" onclick="newChat();switchMode('chat');closeLayers()"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/><path d="M14 7l4-4 3 3-4 4-7 7-4 1 1-4Z"/></svg><span>Novo chat</span></button>
+      <button type="button" class="drawer-profile-trigger" onclick="showProfile()" aria-label="Abrir meu perfil" title="Meu perfil">
+        <span class="user-avatar" id="drawer-user-avatar" aria-hidden="true">P</span>
+      </button>
+    </div>
+  </aside>
+</div>
+<div class="layer" id="profile-layer">
+  <div class="scrim" onclick="closeLayers()"></div>
+  <section class="modal profile-modal" role="dialog" aria-label="Meu perfil" aria-modal="true">
+    <div class="grabber"></div>
+    <div class="profile-head"><h2>Meu perfil</h2><button type="button" class="profile-close" onclick="closeLayers()" aria-label="Fechar perfil">✕</button></div>
+    <p>Personalize como você aparece no HORUS AI. Os dados ficam salvos neste aparelho.</p>
+    <div class="profile-avatar-area">
+      <div class="user-avatar profile-avatar-large" id="profile-user-avatar" aria-label="Foto de perfil">P</div>
+      <div class="profile-field-label" style="align-self:stretch;margin-top:12px">Foto de perfil</div>
+      <div class="profile-photo-hint" style="text-align:center">Imagem padrão do HORUS AI aplicada automaticamente.</div>
+    </div>
+    <div class="profile-field-label">Nome de exibição</div>
+    <input type="text" id="profile-name" class="profile-input" maxlength="32" autocomplete="nickname" placeholder="Seu nome" aria-label="Nome de exibição">
+    <div class="profile-field-label">Sobre mim <span style="font-weight:400;color:#999">(opcional)</span></div>
+    <textarea id="profile-bio" class="profile-input profile-bio" maxlength="120" rows="2" placeholder="Conte um pouco sobre você" aria-label="Sobre mim"></textarea>
+    <button type="button" class="profile-save" onclick="saveProfile()">Salvar perfil</button>
+  </section>
+</div>
+<div class="layer" id="model-layer">
+  <div class="scrim" onclick="closeLayers()"></div>
+  <section class="modal">
+    <div class="grabber"></div>
+    <h2>Escolha seu modelo <span style="color:#72b2ff">✦</span></h2>
+    <p>Somente modelos com acesso gratuito na xKiro.</p>
+    <input id="model-search" placeholder="Buscar modelo grátis…" oninput="renderModelList()">
+    <div id="model-list" class="models-scroll"></div>
+  </section>
+</div>
+<div class="layer" id="settings-layer">
+  <div class="scrim" onclick="closeLayers()"></div>
+  <section class="modal">
+    <div class="grabber"></div>
+    <h2>Configurações</h2>
+    <p>Conexão da HORUS AI com a xKiro.</p>
+    <div class="status-card">● Chave API integrada configurada<br><span style="font-size:11px;color:#79adac">Ela não aparece no chat nem nas mensagens.</span></div>
+    <div class="settings-label">Usar outra chave (opcional)</div>
+    <input id="replacement-key" type="password" autocomplete="off" placeholder="Cole uma nova chave apenas se quiser trocar">
+    <button class="settings-btn" onclick="replaceKey()">Salvar nova chave</button>
+    <button class="settings-btn secondary" onclick="QelvoriNative.resetKey();closeLayers()">Restaurar chave integrada</button>
+
+    <div class="settings-label" style="margin-top:21px;color:#c7dcff;font-size:14px">Compilador Android (GitHub)</div>
+    <p class="builder-github">Para criar APKs de verdade, conecte uma vez seu token do GitHub. Ele é criptografado no celular, não enviado à IA.</p>
+    <div id="gh-connection" class="status-card">GitHub ainda não conectado.</div>
+    <input class="build-field" id="github-token" type="password" autocomplete="off" placeholder="github_pat_...">
+    <button class="settings-btn" onclick="saveGithub()">Conectar GitHub ao compilador</button>
+    <button class="settings-btn secondary" onclick="testGithub()">Testar acesso ao GitHub</button>
+    <button class="settings-btn secondary" onclick="disconnectGithub()">Desconectar GitHub</button>
+    <p class="builder-github">O token precisa de acesso ao repositório privado SEU_REPOSITORIO e permissões <b>Contents: Read/Write</b> e <b>Actions: Read</b>. Configure apenas uma vez. Nunca compartilhe o token no chat.</p>
+    <button class="settings-btn secondary" onclick="closeLayers()">Fechar</button>
+  </section>
+</div>
+
+<div class="layer" id="builder-layer">
+  <div class="scrim" onclick="closeLayers()"></div>
+  <section class="modal build-modal">
+    <div class="grabber"></div>
+    <div class="builder-head"><span class="builder-toplogo">📦</span><h2>Criar APK Android real</h2></div>
+    <p>Descreva seu aplicativo. A HORUS AI cria o código, o GitHub compila com Gradle e o APK vai para Downloads.</p>
+    <div class="build-label">Nome do aplicativo</div>
+    <input class="build-field" id="build-name" maxlength="55" placeholder="Ex.: Meu aplicativo">
+    <div class="build-label">O que ele deve fazer?</div>
+    <textarea class="build-field multiline" id="build-description" placeholder="Ex.: Crie um aplicativo de tarefas, com lista, botão para adicionar, marcar como concluídas e salvar tudo no celular."></textarea>
+    <p class="builder-desc">Novo gerador: aplicativos Android nativos em Kotlin e Jetpack Compose, com layout mobile profissional e funções implementadas. Projetos de streaming usam Media3. A HORUS AI verifica a compilação, mas recursos que dependem de servidores, permissões especiais ou APIs exigem integração própria — ela não simula essas funções nem promete ausência total de bugs.</p>
+    <div id="builder-output" class="builder-status" aria-live="polite">Configure o GitHub nas configurações para começar.</div>
+    <button class="builder-action" id="builder-create" onclick="buildAndroidApk()">Gerar e compilar APK</button>
+    <button class="builder-action secondary" id="builder-retry" onclick="retryApkDownload()" style="display:none">↻ Retomar download do APK pronto</button>
+    <button class="builder-action secondary" id="builder-install" onclick="QelvoriNative.installBuiltApk()" style="display:none">Instalar último APK gerado</button>
+    <button class="builder-action secondary" onclick="showSettings()">Configurar GitHub</button>
+    <button class="builder-action secondary" onclick="closeLayers()">Fechar</button>
+  </section>
+</div>
+<div id="toast"></div>
+<script>
+"use strict";
+const STORE="qelvori_v2_history", MODEL_STORE="qelvori_v2_selected";
+const Q=id=>document.getElementById(id);
+function safeGet(key){try{return localStorage.getItem(key)}catch(e){return null}}
+function safeSet(key,value){try{localStorage.setItem(key,value)}catch(e){}}
+let sessions=[],activeId="",freeModels=[],selectedModel="",isWaiting=false,pendingId="",toastTimer=null;
+function randomId(){return String(Date.now())+"-"+Math.random().toString(36).slice(2,8)}
+function save(){try{safeSet(STORE,JSON.stringify({sessions,activeId}));}catch(e){}}
+function load(){
+  try{
+    const raw=JSON.parse(safeGet(STORE)||"null");
+    if(raw&&Array.isArray(raw.sessions)){sessions=raw.sessions.filter(x=>x&&Array.isArray(x.messages));activeId=raw.activeId||"";}
+  }catch(e){}
+  if(!sessions.length)newChat();
+  if(!sessions.some(x=>x.id===activeId))activeId=sessions[0].id;
+  selectedModel=safeGet(MODEL_STORE)||"";
+  renderAll();
+}
+function active(){return sessions.find(x=>x.id===activeId)}
+function newChat(){
+  const sess={id:randomId(),title:"Nova conversa",messages:[],model:selectedModel,created:Date.now()};
+  sessions.unshift(sess);activeId=sess.id;
+  save();renderAll();Q("prompt").value="";resizePrompt();updateSend();
+}
+let activeMode="chat";
+function switchMode(mode){
+  activeMode=mode==="work"?"work":"chat";
+  Q("tab-chat").classList.toggle("selected",activeMode==="chat");
+  Q("tab-work").classList.toggle("selected",activeMode==="work");
+  Q("tab-chat").setAttribute("aria-selected",String(activeMode==="chat"));
+  Q("tab-work").setAttribute("aria-selected",String(activeMode==="work"));
+  Q("messages").style.display=activeMode==="chat"?"":"none";
+  Q("work-page").style.display=activeMode==="work"?"block":"none";
+  Q("chat-composer").style.display=activeMode==="chat"?"":"none";
+  closeLayers();
+}
+function createNewFromTop(){newChat();switchMode("chat");}
+function openQuickActions(){closeLayers();Q("quick-layer").classList.add("show");}
+function startDictation(){
+  closeLayers();
+  try{QelvoriNative.beginDictation()}
+  catch(e){toast("O reconhecimento de voz não está disponível neste celular.");}
+}
+function sendOrDictate(){
+  if(isWaiting)return;
+  if(Q("prompt").value.trim())sendMessage();
+  else startDictation();
+}
+window.speechResult=function(message){
+  const previous=Q("prompt").value.trim();
+  Q("prompt").value=(previous?previous+" ":"")+String(message||"").trim();
+  switchMode("chat");
+  resizePrompt();updateSend();Q("prompt").focus();
+};
+window.speechError=function(message){toast(message||"Não foi possível usar o microfone.");};
+function showSidebar(){Q("side-layer").classList.add("show");renderChats()}
+function toggleDrawerSearch(){
+  const wrap=Q("drawer-search-wrap");
+  wrap.classList.toggle("expanded");
+  if(wrap.classList.contains("expanded"))Q("search-chats").focus();
+  else {Q("search-chats").blur();Q("search-chats").value="";renderChats();}
+}
+function clearDrawerSearch(){Q("search-chats").value="";renderChats();Q("search-chats").focus()}
+function showModels(){
+  closeLayers();
+  Q("model-layer").classList.add("show");
+  renderModelList();
+  if(!freeModels.length){try{QelvoriNative.models()}catch(e){toast("Não foi possível carregar os modelos.")}}
+}
+function showSettings(){closeLayers();Q("replacement-key").value="";Q("settings-layer").classList.add("show")}
+function closeLayers(){document.querySelectorAll(".layer").forEach(x=>x.classList.remove("show"))}
+window.qelvoriBack=function(){
+  if(document.querySelector(".layer.show")){closeLayers();return}
+  if(activeMode==="work"){switchMode("chat");return}
+  if(Q("prompt").value.trim()){Q("prompt").blur();return}
+  showSidebar();
+};
+
+// Perfil local: sem cadastro ou sincronização com servidor.
+const HORUS_DEFAULT_AVATAR="horus_profile_avatar.png";
+const PROFILE_STORE="horus_ai_local_profile_v1";
+const PROFILE_COLORS=["#2563eb","#3b3b3b","#0f766e","#7c3aed","#b45309"];
+let localProfile={name:"Usuário HORUS",bio:"",photo:HORUS_DEFAULT_AVATAR,color:PROFILE_COLORS[0]};
+let profileDraftPhoto="",profileDraftColor=PROFILE_COLORS[0];
+function loadProfile(){
+  try{
+    const saved=JSON.parse(safeGet(PROFILE_STORE)||"null");
+    if(saved&&typeof saved==="object"){
+      localProfile.name=String(saved.name||"Usuário HORUS").slice(0,32);
+      localProfile.bio=String(saved.bio||"").slice(0,120);
+      localProfile.color=PROFILE_COLORS.includes(saved.color)?saved.color:PROFILE_COLORS[0];
+      localProfile.photo=HORUS_DEFAULT_AVATAR;
+    }
+  }catch(e){}
+  localProfile.photo=HORUS_DEFAULT_AVATAR;
+  renderProfileAvatar();
+}
+function renderProfileAvatar(){
+  localProfile.photo=HORUS_DEFAULT_AVATAR;
+  const initial=(localProfile.name.trim()||"P").slice(0,1).toLocaleUpperCase("pt-BR");
+  for(const id of ["drawer-user-avatar","profile-user-avatar"]){
+    const el=Q(id);if(!el)continue;
+    el.replaceChildren();el.style.background=localProfile.color;
+    if(localProfile.photo){
+      const img=document.createElement("img");img.alt="";img.src=localProfile.photo;el.append(img);
+    }else el.textContent=initial;
+  }
+  const trigger=Q("drawer-user-avatar");if(trigger)trigger.parentNode.title="Meu perfil · "+localProfile.name;
+}
+function showProfile(){
+  closeLayers();
+  profileDraftPhoto=HORUS_DEFAULT_AVATAR;
+  profileDraftColor=localProfile.color;
+  Q("profile-name").value=localProfile.name;
+  Q("profile-bio").value=localProfile.bio;
+
+  renderProfileDraft();
+  Q("profile-layer").classList.add("show");
+}
+function renderProfileDraft(){
+  const name=(Q("profile-name").value||"P").trim();
+  const el=Q("profile-user-avatar");el.replaceChildren();el.style.background=profileDraftColor;
+  if(profileDraftPhoto){const img=document.createElement("img");img.alt="";img.src=profileDraftPhoto;el.append(img)}
+  else el.textContent=name.slice(0,1).toLocaleUpperCase("pt-BR");
+  document.querySelectorAll(".profile-swatch").forEach(el=>{
+    el.style.setProperty("--swatch",el.dataset.color);
+    el.classList.toggle("selected",el.dataset.color===profileDraftColor);
+  });
+}
+function setProfileColor(color){
+  if(!PROFILE_COLORS.includes(color))return;
+  profileDraftColor=color;renderProfileDraft();
+}
+function removeProfilePhoto(){profileDraftPhoto="";renderProfileDraft();toast("Foto removida da prévia. Toque em Salvar perfil.")}
+function isSafeProfilePhotoUrl(value){
+  try{const u=new URL(String(value));return u.protocol==="https:"&&u.href.length<1400&&!!u.hostname}catch(e){return false}
+}
+function applyProfilePhotoUrl(){
+  const url=Q("profile-photo-url").value.trim();
+  if(!isSafeProfilePhotoUrl(url)){toast("Informe um link HTTPS direto de uma imagem.");return}
+  profileDraftPhoto=url;renderProfileDraft();toast("Prévia atualizada. Toque em Salvar perfil.");
+}
+function receiveProfilePhotoBlob(f){
+  if(!f||!/^image\/(jpeg|png|webp)$/.test(f.type)||f.size>5*1024*1024){toast("Cole uma foto JPG, PNG ou WebP com até 5 MB.");return}
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const im=new Image();
+    im.onload=()=>{
+      const side=Math.min(im.width,im.height),c=document.createElement("canvas");
+      c.width=c.height=192;
+      const ctx=c.getContext("2d");if(!ctx){toast("Não foi possível processar a imagem.");return}
+      ctx.drawImage(im,(im.width-side)/2,(im.height-side)/2,side,side,0,0,192,192);
+      const photo=c.toDataURL("image/jpeg",0.72);
+      if(photo.length>=180000){toast("Foto muito grande para o perfil.");return}
+      profileDraftPhoto=photo;renderProfileDraft();toast("Foto pronta. Toque em Salvar perfil.");
+    };
+    im.onerror=()=>toast("Não foi possível abrir a imagem colada.");
+    im.src=String(reader.result||"");
+  };
+  reader.onerror=()=>toast("Não foi possível ler a imagem colada.");
+  reader.readAsDataURL(f);
+}
+function onProfileImagePaste(event){
+  const cd=event.clipboardData;
+  if(!cd)return;
+  const file=Array.from(cd.items||[]).find(i=>i.kind==="file"&&i.type.startsWith("image/"));
+  if(file){event.preventDefault();receiveProfilePhotoBlob(file.getAsFile());return}
+  const text=cd.getData("text/plain").trim();
+  if(isSafeProfilePhotoUrl(text)){event.preventDefault();Q("profile-photo-url").value=text;applyProfilePhotoUrl();return}
+  event.preventDefault();toast("Copie uma imagem ou um link HTTPS de foto.");
+}
+function handleProfilePhoto(event){
+  const f=event.target.files&&event.target.files[0];
+  if(!f)return;
+  if(!["image/jpeg","image/png","image/webp"].includes(f.type)||f.size>5*1024*1024){toast("Escolha uma imagem JPG, PNG ou WebP de até 5 MB.");return}
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const im=new Image();
+    im.onload=()=>{
+      const side=Math.min(im.width,im.height),c=document.createElement("canvas");c.width=c.height=192;
+      const ctx=c.getContext("2d");if(!ctx){toast("Não foi possível processar a foto.");return}
+      ctx.drawImage(im,(im.width-side)/2,(im.height-side)/2,side,side,0,0,192,192);
+      const photo=c.toDataURL("image/jpeg",0.72);
+      if(photo.length>=180000){toast("Essa foto ficou grande demais para salvar.");return}
+      profileDraftPhoto=photo;renderProfileDraft();
+    };
+    im.onerror=()=>toast("Não foi possível abrir essa imagem.");
+    im.src=String(reader.result||"");
+  };
+  reader.onerror=()=>toast("Não foi possível ler essa imagem.");
+  reader.readAsDataURL(f);
+}
+function saveProfile(){
+  const name=Q("profile-name").value.trim().replace(/\s+/g," ");
+  if(!name){toast("Informe um nome para o perfil.");Q("profile-name").focus();return}
+  const next={name:name.slice(0,32),bio:Q("profile-bio").value.trim().slice(0,120),photo:HORUS_DEFAULT_AVATAR,color:profileDraftColor};
+  try{localStorage.setItem(PROFILE_STORE,JSON.stringify(next))}catch(e){toast("Não foi possível salvar. Tente remover a foto.");return}
+  localProfile=next;renderProfileAvatar();closeLayers();toast("Perfil salvo neste aparelho.");
+}
+
+function togglePinChat(id){
+  const sess=sessions.find(x=>x.id===id);if(!sess)return;
+  sess.pinned=!sess.pinned;
+  save();renderChats();
+  toast(sess.pinned?"Conversa fixada":"Conversa desafixada");
+}
+function deleteChat(id){
+  sessions=sessions.filter(x=>x.id!==id);
+  if(!sessions.length){activeId="";newChat()}
+  else if(activeId===id)activeId=sessions[0].id;
+  save();renderAll();toast("Conversa excluída");
+}
+function renderChats(){
+  const query=Q("search-chats").value.trim().toLocaleLowerCase("pt-BR");
+  const list=Q("chat-list");list.innerHTML="";
+  const matching=sessions.filter(x=>String(x.title||"").toLocaleLowerCase("pt-BR").includes(query));
+  const collections=[["Fixados",matching.filter(x=>x.pinned)],["Chats",matching.filter(x=>!x.pinned)]];
+  for(const [heading,chats] of collections){
+    if(!chats.length)continue;
+    const label=document.createElement("h3");label.className="drawer-section";label.textContent=heading;list.append(label);
+    for(const x of chats){
+      const item=document.createElement("div");item.className="drawer-chat-item"+(x.id===activeId?" active":"");
+      const btn=document.createElement("button");btn.className="drawer-chat-title";
+      const icon=document.createElement("span");icon.className="drawer-chat-glyph";
+      icon.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5a8.5 8.5 0 0 1-9 8.5 9 9 0 0 1-3.5-.7L3 21l1.4-4a8.4 8.4 0 0 1-1-4 8.6 8.6 0 1 1 16.6-1.5Z"/></svg>';
+      const title=document.createElement("span");title.textContent=x.title||"Nova conversa";
+      btn.append(icon,title);
+      btn.onclick=()=>{activeId=x.id;save();switchMode("chat");renderAll();closeLayers()};
+      const pin=document.createElement("button");pin.className="drawer-small-btn pin"+(x.pinned?" pinned":"");
+      pin.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 3 6 6-1 4 4 4-1 1-5-3-6 6 2-8-4-5 1-1 4 4Z"/></svg>';pin.title=x.pinned?"Desafixar":"Fixar";
+      pin.setAttribute("aria-label",pin.title+" conversa");pin.onclick=()=>togglePinChat(x.id);
+      const del=document.createElement("button");del.className="drawer-small-btn";del.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6"/></svg>';
+      del.title="Excluir conversa";del.setAttribute("aria-label",del.title);del.onclick=()=>deleteChat(x.id);
+      item.append(btn,pin,del);list.append(item);
+    }
+  }
+  if(!matching.length){const empty=document.createElement("p");empty.className="drawer-empty";
+    empty.textContent=query?"Nenhuma conversa encontrada.":"Suas conversas aparecerão aqui.";list.append(empty)}
+}
+
+function escapeHtml(x){return String(x).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function fmt(text){
+  let t=escapeHtml(text);
+  const code=[];
+  t=t.replace(/```(?:[a-zA-Z0-9+#-]*)\n?([\s\S]*?)```/g,(_,v)=>{code.push("<pre><code>"+v.trim()+"</code></pre>");return "QELVORICODEBLOCK"+(code.length-1)+"END"});
+  t=t.replace(/^### (.+)$/gm,"<h4>$1</h4>").replace(/^## (.+)$/gm,"<h3>$1</h3>");
+  t=t.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");
+  t=t.replace(/`([^\n`]+)`/g,"<code>$1</code>");
+  t=t.split(/\n\s*\n/).map(part=>part.startsWith("<h3")||part.startsWith("<h4")||part.startsWith("QELVORICODEBLOCK")?part:"<p>"+part.replace(/\n/g,"<br>")+"</p>").join("");
+  return t.replace(/QELVORICODEBLOCK(\d+)END/g,(_,n)=>code[Number(n)]||"");
+}
+function welcome(){
+  return '<section class="empty"><div class="logo"><img src="app_logo.png" alt="HORUS AI"></div><h1>Como posso ajudar?</h1><p>Sou a HORUS AI, sua assistente com modelos gratuitos e inteligência para ir além.</p><div class="cards">'+
+  [['✦','Criar uma ideia','Me ajude com uma ideia criativa'],['⌘','Escrever melhor','Melhore um texto para mim'],['◈','Aprender algo','Me explique um assunto difícil'],['⚡','Programar','Me ajude com código para um app']].map(x=>'<button class="card" data-prompt="'+escapeHtml(x[2])+'"><span class="mini">'+x[0]+'</span><strong>'+x[1]+'</strong><span class="sub">Toque para começar</span></button>').join("")+'</div></section>';
+}
+function renderConversation(){
+  const sess=active();const c=Q("conversation");if(!sess)return;
+  if(!sess.messages.length){c.innerHTML="";}
+  else {
+    c.innerHTML=sess.messages.map((m,i)=>{
+      if(m.role==="user")return '<div class="msg-row user"><div class="user-bubble">'+escapeHtml(m.content)+'</div></div>';
+      return '<div class="msg-row assistant"><div class="assistant-wrap"><div class="assistant-logo"><img src="app_logo.png" alt="HORUS AI"></div><div class="assistant-text">'+fmt(m.content)+'</div></div><div class="answer-actions"><button class="action-mini" onclick="copyAnswer('+i+')">▢ Copiar</button></div></div>';
+    }).join("");
+  }
+  if(isWaiting&&activeId===pendingId){c.innerHTML+='<div class="msg-row assistant" id="typing"><div class="assistant-wrap"><div class="assistant-logo"><img src="app_logo.png" alt="HORUS AI"></div><div class="typing"><b></b><b></b><b></b></div></div></div>';}
+  const sc=Q("messages");setTimeout(()=>sc.scrollTop=sc.scrollHeight,30);
+}
+function copyAnswer(index){
+  const msg=active().messages[index];if(!msg)return;
+  const temp=document.createElement("textarea");temp.value=msg.content;temp.style.position="fixed";temp.style.top="-2000px";document.body.append(temp);temp.select();
+  try{document.execCommand("copy");toast("Resposta copiada")}catch(e){toast("Não foi possível copiar")}
+  temp.remove();
+}
+function renderAll(){renderConversation();renderChats();updateModelLabel();updateSend()}
+function updateModelLabel(){
+  const entry=freeModels.find(x=>x.id===selectedModel);
+  Q("model-label").textContent=entry?entry.name:(freeModels.length?"Escolha um modelo gratuito":"Buscando modelos gratuitos…");
+}
+function renderModelList(){
+  const list=Q("model-list"),q=Q("model-search").value.toLowerCase();
+  list.innerHTML="";
+  if(!freeModels.length){list.innerHTML='<p style="padding:18px">Carregando modelos…</p>';return;}
+  let count=0;
+  for(const m of freeModels){
+    if(!(m.name+" "+m.id).toLowerCase().includes(q))continue;
+    count++;
+    const el=document.createElement("button");el.className="model-row"+(m.id===selectedModel?" active":"");
+    const logo=document.createElement("div");logo.className="vendor-circle";logo.textContent=(m.vendor||m.name).slice(0,1).toUpperCase();
+    const meta=document.createElement("div");meta.className="model-meta";
+    const strong=document.createElement("strong");strong.textContent=m.name;
+    const small=document.createElement("small");small.textContent=m.id;
+    meta.append(strong,small);
+    const tag=document.createElement("span");tag.className="free-tag";tag.textContent="GRÁTIS";
+    el.append(logo,meta,tag);
+    el.onclick=()=>chooseModel(m.id);list.append(el);
+  }
+  if(!count)list.innerHTML='<p style="padding:15px">Nenhum modelo encontrado.</p>';
+}
+function chooseModel(id){
+  if(!freeModels.some(x=>x.id===id))return;
+  if(selectedModel!==id && active() && active().messages.length){newChat();}
+  selectedModel=id;safeSet(MODEL_STORE,id);
+  if(active())active().model=id;
+  save();updateModelLabel();updateSend();closeLayers();
+  const chosen=freeModels.find(x=>x.id===id);
+  if(chosen)toast("Modelo selecionado: "+chosen.name);
+}
+function toast(message){
+  const el=Q("toast");el.textContent=message;el.classList.add("visible");
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("visible"),2900);
+}
+function updateSend(){
+  const hasText=!!Q("prompt").value.trim();
+  Q("send").classList.toggle("has-text",hasText);
+  Q("send").disabled=isWaiting;
+}
+function resizePrompt(){const el=Q("prompt");el.style.height="27px";el.style.height=Math.min(el.scrollHeight,150)+"px"}
+Q("prompt").addEventListener("input",()=>{resizePrompt();updateSend()});
+Q("prompt").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}});
+function sendMessage(){
+  const message=Q("prompt").value.trim();
+  if(/^(crie|criar|faça|fazer|gere|gerar|quero criar|construa|desenvolva)\b/i.test(message) && /\b(apk|aplicativo|app android)\b/i.test(message)){
+    Q("prompt").value="";resizePrompt();updateSend();showBuilder(message);return;
+  }
+  if(!message||!selectedModel||isWaiting){if(!selectedModel)showModels();return;}
+  let sess=active();if(!sess){newChat();sess=active();}
+  sess.messages.push({role:"user",content:message});
+  if(sess.title==="Nova conversa")sess.title=message.slice(0,38)+(message.length>38?"…":"");
+  sess.model=selectedModel;save();
+  Q("prompt").value="";resizePrompt();Q("prompt").blur();
+  isWaiting=true;pendingId=sess.id;updateSend();renderAll();
+  const request=sess.messages.map(x=>({role:x.role,content:x.content}));
+  try{QelvoriNative.chat(sess.id,selectedModel,JSON.stringify(request));}
+  catch(e){chatError("Erro ao conectar com o aplicativo.")}
+}
+window.receiveModels=function(data){
+  try{
+    const models=JSON.parse(data);
+    freeModels=Array.isArray(models)?models.filter(x=>x&&x.id&&x.name):[];
+    if(!freeModels.find(x=>x.id===selectedModel))selectedModel=freeModels.length?freeModels[0].id:"";
+    if(selectedModel)safeSet(MODEL_STORE,selectedModel);
+    updateModelLabel();renderModelList();updateSend();
+    if(!freeModels.length)toast("Nenhum modelo gratuito disponível.");
+  }catch(e){toast("Falha ao ler modelos.");}
+};
+window.modelsError=function(message){Q("model-label").textContent="Toque para atualizar";toast(message);};
+window.chatSuccess=function(raw){
+  try{
+    const data=JSON.parse(raw),sess=sessions.find(x=>x.id===data.id);
+    if(sess){sess.messages.push({role:"assistant",content:data.text});save();}
+  }catch(e){toast("Falha ao processar resposta")}
+  isWaiting=false;pendingId="";renderAll();
+};
+window.chatError=function(message){
+  isWaiting=false;pendingId="";renderAll();toast(message||"Falha ao responder.");
+};
+window.nativeNotice=function(message){toast(message)};
+function replaceKey(){
+  const val=Q("replacement-key").value.trim();if(!val.startsWith("sk-")){toast("Digite uma chave válida.");return;}
+  QelvoriNative.setKey(val);Q("replacement-key").value="";closeLayers();
+}
+
+let builderRunning=false;
+function showBuilder(prefill=""){
+  closeLayers();
+  if(prefill)Q("build-description").value=prefill;
+  if(!Q("build-name").value)Q("build-name").value="Meu Aplicativo";
+  Q("builder-layer").classList.add("show");
+  Q("builder-layer").querySelector(".build-modal").scrollTop=0;
+  try{QelvoriNative.builderState()}catch(e){}
+}
+function saveGithub(){
+  const input=Q("github-token");
+  const value=input.value.trim();input.value="";
+  if(!value){toast("Cole seu token do GitHub.");return}
+  try{QelvoriNative.saveGithubToken(value)}catch(e){toast("Falha ao salvar o token.")}
+}
+function testGithub(){
+  Q("gh-connection").textContent="Verificando o acesso ao repositório privado…";
+  try{QelvoriNative.testGithubAccess();}catch(e){toast("Não foi possível testar o GitHub.");}
+}
+function disconnectGithub(){
+  if(confirm("Remover a conexão do GitHub?"))QelvoriNative.removeGithubToken();
+}
+function retryApkDownload(){
+  builderRunning=true;
+  Q("builder-create").disabled=true;
+  Q("builder-retry").disabled=true;
+  Q("builder-output").textContent="Recuperando o APK já compilado no GitHub…";
+  try{QelvoriNative.resumeApkBuild();}
+  catch(e){window.builderError("Não foi possível retomar o download do APK.");}
+}
+function buildAndroidApk(){
+  const name=Q("build-name").value.trim();
+  const description=Q("build-description").value.trim();
+  if(!name||description.length<12){toast("Digite o nome e os recursos do aplicativo.");return}
+  if(!selectedModel){toast("Selecione primeiro um modelo gratuito.");return}
+  builderRunning=true;
+  Q("builder-create").disabled=true;
+  Q("builder-output").textContent="Preparando seu aplicativo…";
+  try{QelvoriNative.createApk(name,description,selectedModel)}catch(e){window.builderError("Falha ao iniciar a compilação.")}
+}
+window.builderNotice=function(message){toast(message);try{QelvoriNative.builderState()}catch(e){}};
+window.builderProgress=function(message){
+  builderRunning=true;
+  Q("builder-output").textContent=message;
+  Q("builder-create").disabled=true;
+  Q("builder-retry").disabled=true;
+};
+window.builderError=function(message){
+  builderRunning=false;Q("builder-create").disabled=false;
+  Q("builder-output").textContent=message;
+  Q("builder-retry").disabled=false;
+  try{QelvoriNative.builderState()}catch(e){}
+  toast(message);
+};
+window.builderComplete=function(data){
+  builderRunning=false;Q("builder-create").disabled=false;
+  try{
+    const result=JSON.parse(data);
+    Q("builder-output").textContent="✅ APK compilado de verdade! Arquivo: "+result.name+"\nSalvo em Downloads/HORUS AI.";
+  }catch(e){Q("builder-output").textContent="APK gerado. Abra a pasta Downloads."}
+  Q("builder-install").style.display="block";
+  Q("builder-retry").style.display="none";
+  Q("builder-retry").disabled=false;
+  Q("builder-layer").classList.add("show");
+  toast("APK criado com sucesso!");
+};
+window.builderState=function(data){
+  try {
+    const status=JSON.parse(data);
+    Q("gh-connection").textContent=!status.configured?"● Sem token. Configure o GitHub para criar APKs.":status.checked?"● Acesso ao repositório confirmado.":"● Token salvo, acesso ainda não confirmado. Toque em Testar acesso ao GitHub.";
+    if(status.lastUri){Q("builder-install").style.display="block";}
+    Q("builder-retry").style.display=status.pending?"block":"none";
+    Q("builder-retry").disabled=builderRunning;
+    if(status.pending&&!builderRunning && !Q("builder-output").textContent.startsWith("Não foi possível")){
+      Q("builder-output").textContent="Um APK ainda está pendente. Toque em Retomar download para recuperar o mesmo arquivo.";
+    }
+  }catch(e){}
+};
+
+
+
+load();
+loadProfile();
+Q("profile-name").addEventListener("input",renderProfileDraft);
+
+try{QelvoriNative.builderState();QelvoriNative.resumeApkBuild();}catch(e){}
+try{QelvoriNative.models();}catch(e){toast("Abra este aplicativo no Android para conectar à IA.")}
+</script>
+<script>
+/* Keep the composer above Android navigation buttons and the on-screen keyboard. */
+(function(){
+  var initialHeight=Math.max(window.innerHeight, window.visualViewport ? window.visualViewport.height : 0);
+  var scheduled=false;
+  function adjust(){
+    scheduled=false;
+    var vv=window.visualViewport;
+    var visible=vv ? vv.height : window.innerHeight;
+    var focused=document.activeElement &&
+      (document.activeElement.tagName==='TEXTAREA' || document.activeElement.tagName==='INPUT');
+    var keyboardOpen=focused && (initialHeight-visible>140 || (vv && window.innerHeight-visible>140));
+    document.body.classList.toggle('horus-keyboard-visible', !!keyboardOpen);
+    if(keyboardOpen){
+      document.documentElement.style.setProperty('--horus-visible-height',Math.max(200,Math.round(visible+(vv ? vv.offsetTop : 0)))+'px');
+    } else {
+      document.documentElement.style.removeProperty('--horus-visible-height');
+      if(!focused)initialHeight=Math.max(initialHeight,window.innerHeight,visible);
+    }
+  }
+  function schedule(){if(!scheduled){scheduled=true;requestAnimationFrame(adjust)}}
+  window.addEventListener('resize', schedule);
+  window.addEventListener('orientationchange', function(){
+    initialHeight=window.innerHeight;
+    setTimeout(schedule,120);
+  });
+  document.addEventListener('focusin',function(){schedule();setTimeout(schedule,320)},true);
+  document.addEventListener('focusout',function(){setTimeout(schedule,100)},true);
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize',schedule);
+    window.visualViewport.addEventListener('scroll',schedule);
+  }
+  schedule();
+})();
+</script>
+</body>
+</html>
